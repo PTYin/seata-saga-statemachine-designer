@@ -1,9 +1,38 @@
 /* eslint-disable max-len */
 
+// helpers //////////////////////
+
+// copied and adjusted from https://github.com/adobe-webplatform/Snap.svg/blob/master/src/svg.js
+const tokenRegex = /\{([^{}]+)\}/g;
+const objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g; // matches .xxxxx or ["xxxxx"] to run over object properties
+
+function replacer(all, key, obj) {
+  let res = obj;
+  key.replace(objNotationRegex, (_, name, quote, quotedName, isFunc) => {
+    name = name || quotedName;
+    if (res) {
+      if (name in res) {
+        res = res[name];
+      }
+      if (typeof res === 'function' && isFunc) {
+        res = res();
+      }
+    }
+  });
+  res = `${res == null || res === obj ? all : res}`;
+
+  return res;
+}
+
+function format(str, obj) {
+  return String(str).replace(tokenRegex, (all, key) => {
+    return replacer(all, key, obj);
+  });
+}
+
 /**
  * Map containing SVG paths needed by BpmnRenderer.
  */
-
 export default function PathMap() {
   /**
    * Contains a map of path elements
@@ -164,32 +193,4 @@ export default function PathMap() {
     });
     return path;
   };
-}
-
-// helpers //////////////////////
-
-// copied and adjusted from https://github.com/adobe-webplatform/Snap.svg/blob/master/src/svg.js
-const tokenRegex = /\{([^{}]+)\}/g;
-const objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g; // matches .xxxxx or ["xxxxx"] to run over object properties
-
-function replacer(all, key, obj) {
-  let res = obj;
-  key.replace(objNotationRegex, (all, name, quote, quotedName, isFunc) => {
-    name = name || quotedName;
-    if (res) {
-      if (name in res) {
-        res = res[name];
-      }
-      typeof res === 'function' && isFunc && (res = res());
-    }
-  });
-  res = `${res == null || res === obj ? all : res}`;
-
-  return res;
-}
-
-function format(str, obj) {
-  return String(str).replace(tokenRegex, (all, key) => {
-    return replacer(all, key, obj);
-  });
 }

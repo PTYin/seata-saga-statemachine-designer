@@ -13,13 +13,13 @@ export default function TextRenderer(config) {
     fontSize: DEFAULT_FONT_SIZE,
     fontWeight: 'normal',
     lineHeight: LINE_HEIGHT_RATIO,
-  }, config && config.defaultStyle || {});
+  }, (config && config.defaultStyle) || {});
 
   const fontSize = parseInt(defaultStyle.fontSize, 10) - 1;
 
   const externalStyle = assign({}, defaultStyle, {
     fontSize,
-  }, config && config.externalStyle || {});
+  }, (config && config.externalStyle) || {});
 
   const textUtil = new TextUtil({
     style: defaultStyle,

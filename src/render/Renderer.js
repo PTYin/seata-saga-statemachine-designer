@@ -58,17 +58,6 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   const defaultStrokeColor = (config && config.defaultStrokeColor) || black;
   const defaultLabelColor = (config && config.defaultLabelColor);
 
-  function marker(type, fill, stroke) {
-    const id = `${type}-${colorEscape(fill)
-    }-${colorEscape(stroke)}`;
-
-    if (!markers[id]) {
-      createMarker(id, type, fill, stroke);
-    }
-
-    return `url(#${id})`;
-  }
-
   function addMarker(id, options) {
     const attrs = assign({
       strokeWidth: 1,
@@ -86,13 +75,13 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
       attrs.strokeDasharray = [10000, 1];
     }
 
-    const marker = svgCreate('marker');
+    const markerElement = svgCreate('marker');
 
     svgAttr(options.element, attrs);
 
-    svgAppend(marker, options.element);
+    svgAppend(markerElement, options.element);
 
-    svgAttr(marker, {
+    svgAttr(markerElement, {
       id,
       viewBox: '0 0 20 20',
       refX: ref.x,
@@ -102,17 +91,19 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
       orient: 'auto',
     });
 
+    // eslint-disable-next-line no-underscore-dangle
     let defs = domQuery('defs', canvas._svg);
 
     if (!defs) {
       defs = svgCreate('defs');
 
+      // eslint-disable-next-line no-underscore-dangle
       svgAppend(canvas._svg, defs);
     }
 
-    svgAppend(defs, marker);
+    svgAppend(defs, markerElement);
 
-    markers[id] = marker;
+    markers[id] = markerElement;
   }
 
   function createMarker(id, type, fill, stroke) {
@@ -185,6 +176,17 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
         scale: 0.9,
       });
     }
+  }
+
+  function marker(type, fill, stroke) {
+    const id = `${type}-${colorEscape(fill)
+    }-${colorEscape(stroke)}`;
+
+    if (!markers[id]) {
+      createMarker(id, type, fill, stroke);
+    }
+
+    return `url(#${id})`;
   }
 
   function drawRect(p, width, height, r, offset, attrs) {

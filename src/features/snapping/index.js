@@ -6,8 +6,8 @@ export default {
   __depends__: [SnappingModule],
   __init__: [
     'bendpointSnapping',
-    // 'connectSnapping',
+    'connectSnapping',
   ],
   bendpointSnapping: ['type', BendpointSnapping],
-  // connectSnapping: ['type', ConnectSnapping],
+  connectSnapping: ['type', ConnectSnapping],
 };

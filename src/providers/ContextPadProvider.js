@@ -79,11 +79,12 @@ ContextPadProvider.prototype.getContextPadEntries = function (element) {
 
   const { businessObject } = element;
 
+  // eslint-disable-next-line no-shadow
   function startConnect(event, element, autoActivate) {
     connect.start(event, element, autoActivate);
   }
 
-  function removeElement(e) {
+  function removeElement() {
     modeling.removeElements([element]);
   }
 
@@ -123,22 +124,22 @@ ContextPadProvider.prototype.getContextPadEntries = function (element) {
       title = `Append ${type}`;
     }
 
-    function appendStart(event, element) {
+    function appendStart(event, e) {
       const shape = elementFactory.createShape(assign({ type }, options));
 
       create.start(event, shape, {
-        source: element,
+        source: e,
         hints: {
-          connectionTarget: element,
+          connectionTarget: e,
         },
       });
     }
 
-    const append = autoPlace ? function (event, element) {
+    const append = autoPlace ? function (event, e) {
       const shape = elementFactory.createShape(assign({ type }, options));
 
-      autoPlace.append(element, shape, {
-        connectionTarget: element,
+      autoPlace.append(e, shape, {
+        connectionTarget: e,
       });
     } : appendStart;
 

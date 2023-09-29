@@ -1,20 +1,20 @@
-const CopyPlugin = require('copy-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
-    bundle: './src/index.js'
+    bundle: './src/index.js',
   },
   output: {
-    path: __dirname + '/dist',
-    filename: '[name].js'
+    path: `${__dirname}/dist`,
+    filename: '[name].js',
   },
   plugins: [
     new CopyPlugin({
       patterns: [
-        {from: 'public'}
-      ]
+        { from: 'public' },
+      ],
     }),
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
@@ -30,9 +30,9 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
-          }
-        }
+            presets: ['@babel/preset-env'],
+          },
+        },
       },
       {
         test: /\.css$/,
@@ -41,5 +41,5 @@ module.exports = {
     ],
   },
   mode: 'development',
-  devtool: 'source-map'
+  devtool: 'source-map',
 };
