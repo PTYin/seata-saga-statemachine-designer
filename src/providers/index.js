@@ -1,4 +1,4 @@
-import ExampleContextPadProvider from './ContextPadProvider';
+import ContextPadProvider from './ContextPadProvider';
 import PaletteProvider from './PaletteProvider';
 
 export default {
@@ -6,6 +6,6 @@ export default {
     'contextPadProvider',
     'paletteProvider',
   ],
-  contextPadProvider: ['type', ExampleContextPadProvider],
+  contextPadProvider: ['type', ContextPadProvider],
   paletteProvider: ['type', PaletteProvider],
 };

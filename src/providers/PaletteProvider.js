@@ -1,3 +1,5 @@
+import { assign } from 'min-dash';
+
 /**
  * A example palette provider.
  */
@@ -22,6 +24,23 @@ PaletteProvider.prototype.getPaletteEntries = function () {
   const { elementFactory } = this;
   const { lassoTool } = this;
 
+  function createAction(type, group, className, title, options) {
+    function createListener(event) {
+      const shape = elementFactory.createShape(assign({ type }, options));
+      create.start(event, shape);
+    }
+
+    return {
+      group,
+      className,
+      title,
+      action: {
+        dragstart: createListener,
+        click: createListener,
+      },
+    };
+  }
+
   return {
     'lasso-tool': {
       group: 'tools',
@@ -37,36 +56,8 @@ PaletteProvider.prototype.getPaletteEntries = function () {
       group: 'tools',
       separator: true,
     },
-    'create-shape': {
-      group: 'create',
-      className: 'palette-icon-create-shape',
-      title: 'Create ServiceTask',
-      action: {
-        click(event) {
-          const shape = elementFactory.createShape({
-            width: 100,
-            height: 80,
-          });
-
-          create.start(event, shape);
-        },
-      },
-    },
-    'create-frame': {
-      group: 'create',
-      className: 'palette-icon-create-frame',
-      title: 'Create Frame',
-      action: {
-        click(event) {
-          const shape = elementFactory.createShape({
-            width: 300,
-            height: 200,
-            isFrame: true,
-          });
-
-          create.start(event, shape);
-        },
-      },
-    },
+    'create-service-task': createAction('ServiceTask', 'task', 'bpmn-icon-service-task', 'Create ServiceTask'),
+    'create-script-task': createAction('ScriptTask', 'task', 'bpmn-icon-script-task', 'Create ScriptTask'),
+    'create-choice': createAction('Choice', 'gateway', 'bpmn-icon-gateway-xor', 'Create Choice'),
   };
 };

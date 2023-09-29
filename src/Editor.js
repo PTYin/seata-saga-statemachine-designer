@@ -9,11 +9,12 @@ import ConnectModule from 'diagram-js/lib/features/connect';
 import ContextPadModule from 'diagram-js/lib/features/context-pad';
 import ConnectPreviewModule from 'diagram-js/lib/features/connection-preview';
 import CreateModule from 'diagram-js/lib/features/create';
-import GridSnapping from 'diagram-js/lib/features/grid-snapping/GridSnapping';
+import EditorActionsModule from 'diagram-js/lib/features/editor-actions';
+import GridSnappingModule from 'diagram-js/lib/features/grid-snapping';
+import KeyboardModule from 'diagram-js/lib/features/keyboard';
 import KeyboardMoveModule from 'diagram-js/lib/navigation/keyboard-move';
 import KeyboardMoveSelectionModule from 'diagram-js/lib/features/keyboard-move-selection';
 import LassoToolModule from 'diagram-js/lib/features/lasso-tool';
-import ModelingModule from 'diagram-js/lib/features/modeling';
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import MoveModule from 'diagram-js/lib/features/move';
 import OutlineModule from 'diagram-js/lib/features/outline';
@@ -24,21 +25,15 @@ import SelectionModule from 'diagram-js/lib/features/selection';
 import SnappingModule from 'diagram-js/lib/features/snapping';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 
-import ProvidersModule from './providers';
-import RenderModule from './render';
-import LayoutModule from './features/layout';
+import Layout from './features/layout';
+import Modeling from './modeling';
+import Providers from './providers';
+import Render from './render';
 
 import 'diagram-js/assets/diagram-js.css';
+import 'bpmn-font/dist/css/bpmn.css';
 import './index.css';
 
-const ElementStyleModule = {
-  __init__: [
-    ['defaultRenderer', function (defaultRenderer) {
-      // override default styles
-      defaultRenderer.SHAPE_STYLE = { fill: 'white', stroke: '#000', strokeWidth: 2 };
-    }],
-  ],
-};
 /**
  * Our editor constructor
  *
@@ -57,10 +52,10 @@ export default function Editor(options) {
 inherits(Editor, Diagram);
 
 Editor.prototype.modules = [
-  RenderModule,
-  ProvidersModule,
-  ElementStyleModule,
-  LayoutModule,
+  Layout,
+  Modeling,
+  Providers,
+  Render,
 
   AlignElementsModule,
   AutoScrollModule,
@@ -69,11 +64,12 @@ Editor.prototype.modules = [
   ConnectPreviewModule,
   ContextPadModule,
   CreateModule,
-  GridSnapping,
+  GridSnappingModule,
+  EditorActionsModule,
+  KeyboardModule,
   KeyboardMoveModule,
   KeyboardMoveSelectionModule,
   LassoToolModule,
-  ModelingModule,
   MoveCanvasModule,
   MoveModule,
   OutlineModule,

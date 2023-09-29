@@ -2,7 +2,7 @@ import inherits from 'inherits-browser';
 
 import {
   isObject,
-  assign,
+  assign, forEach,
 } from 'min-dash';
 
 import {
@@ -22,7 +22,9 @@ import {
   createLine,
 } from 'diagram-js/lib/util/RenderUtil';
 
-const black = 'hsl(225, 10%, 15%)';
+const BLACK = 'hsl(225, 10%, 15%)';
+const TASK_BORDER_RADIUS = 10;
+const DEFAULT_FILL_OPACITY = 0.95;
 
 // helper functions //////////////////////
 
@@ -55,7 +57,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   const markers = {};
 
   const defaultFillColor = (config && config.defaultFillColor) || 'white';
-  const defaultStrokeColor = (config && config.defaultStrokeColor) || black;
+  const defaultStrokeColor = (config && config.defaultStrokeColor) || BLACK;
   const defaultLabelColor = (config && config.defaultLabelColor);
 
   function addMarker(id, options) {
@@ -198,7 +200,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
     offset = offset || 0;
 
     attrs = computeStyle(attrs, {
-      stroke: black,
+      stroke: BLACK,
       strokeWidth: 2,
       fill: 'white',
     });
@@ -230,7 +232,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   }
 
   function renderEmbeddedLabel(p, element, align, options) {
-    const name = 'TODO';
+    const { name } = element.businessObject;
 
     options = assign({
       box: element,
@@ -247,7 +249,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   function drawPath(p, d, attrs) {
     attrs = computeStyle(attrs, ['no-fill'], {
       strokeWidth: 2,
-      stroke: black,
+      stroke: BLACK,
     });
 
     const path = svgCreate('path');
@@ -261,7 +263,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
 
   function drawLine(p, waypoints, attrs) {
     attrs = computeStyle(attrs, ['no-fill'], {
-      stroke: black,
+      stroke: BLACK,
       strokeWidth: 2,
       fill: 'none',
     });
@@ -272,8 +274,56 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
 
     return line;
   }
-  const handlers = {
-    line(p, element) {
+
+  function drawMarker(type, parentGfx, path, attrs) {
+    return drawPath(parentGfx, path, assign({ 'data-marker': type }, attrs));
+  }
+
+  let handlers;
+
+  function renderer(type) {
+    return handlers[type];
+  }
+
+  function attachTaskMarkers(p, element, taskMarkers) {
+    const obj = getSemantic(element);
+
+    const sub = taskMarkers && taskMarkers.indexOf('SubStateMachine') !== -1;
+    let position;
+
+    if (sub) {
+      position = {
+        seq: -21,
+        parallel: -22,
+        compensation: -42,
+        loop: -18,
+      };
+    } else {
+      position = {
+        seq: -3,
+        parallel: -6,
+        compensation: -27,
+        loop: 0,
+      };
+    }
+
+    forEach(taskMarkers, (m) => {
+      renderer(m)(p, element, position);
+    });
+
+    if (obj.IsForCompensation) {
+      renderer('CompensationMarker')(p, element, position);
+    }
+
+    const { Loop } = obj;
+
+    if (Loop) {
+      renderer('LoopMarker')(p, element, position);
+    }
+  }
+
+  handlers = {
+    Connection(p, element) {
       const fill = getFillColor(element, defaultFillColor);
       const stroke = getStrokeColor(element, defaultStrokeColor);
       const attrs = {
@@ -281,175 +331,103 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
         strokeWidth: 1,
         strokeLinecap: 'round',
         strokeLinejoin: 'round',
-        markerEnd: marker('information-requirement-end', fill, stroke),
+        markerEnd: marker('connection-end', fill, stroke),
       };
 
       return drawLine(p, element.waypoints, attrs);
     },
-    'dmn:Decision': function (p, element) {
-      const rect = drawRect(p, element.width, element.height, 0, {
-        stroke: getStrokeColor(element, defaultStrokeColor),
+    Task(parentGfx, element) {
+      const attrs = {
         fill: getFillColor(element, defaultFillColor),
-      });
+        stroke: getStrokeColor(element, defaultStrokeColor),
+        fillOpacity: DEFAULT_FILL_OPACITY,
+      };
 
-      renderEmbeddedLabel(p, element, 'center-middle');
+      const rect = drawRect(parentGfx, element.width, element.height, TASK_BORDER_RADIUS, attrs);
+
+      renderEmbeddedLabel(parentGfx, element, 'center-middle');
+      attachTaskMarkers(parentGfx, element);
 
       return rect;
     },
-    'dmn:KnowledgeSource': function (p, element) {
-      const pathData = pathMap.getScaledPath('KNOWLEDGE_SOURCE', {
-        xScaleFactor: 1.021,
-        yScaleFactor: 1,
-        containerWidth: element.width,
-        containerHeight: element.height,
-        position: {
-          mx: 0.0,
-          my: 0.075,
+    ServiceTask(parentGfx, element) {
+      const task = renderer('Task')(parentGfx, element);
+      const pathDataBG = pathMap.getScaledPath('TASK_TYPE_SERVICE', {
+        abspos: {
+          x: 12,
+          y: 18,
         },
       });
 
-      const knowledgeSource = drawPath(p, pathData, {
-        strokeWidth: 2,
+      /* service bg */ drawPath(parentGfx, pathDataBG, {
+        strokeWidth: 1,
         fill: getFillColor(element, defaultFillColor),
         stroke: getStrokeColor(element, defaultStrokeColor),
       });
 
-      renderEmbeddedLabel(p, element, 'center-middle');
+      const fillPathData = pathMap.getScaledPath('TASK_TYPE_SERVICE_FILL', {
+        abspos: {
+          x: 17.2,
+          y: 18,
+        },
+      });
 
-      return knowledgeSource;
+      /* service fill */ drawPath(parentGfx, fillPathData, {
+        strokeWidth: 0,
+        fill: getFillColor(element, defaultFillColor),
+      });
+
+      const pathData = pathMap.getScaledPath('TASK_TYPE_SERVICE', {
+        abspos: {
+          x: 17,
+          y: 22,
+        },
+      });
+
+      /* service */ drawPath(parentGfx, pathData, {
+        strokeWidth: 1,
+        fill: getFillColor(element, defaultFillColor),
+        stroke: getStrokeColor(element, defaultStrokeColor),
+      });
+
+      return task;
     },
-    'dmn:BusinessKnowledgeModel': function (p, element) {
-      const pathData = pathMap.getScaledPath('BUSINESS_KNOWLEDGE_MODEL', {
+    LoopMarker(parentGfx, element, position) {
+      const markerPath = pathMap.getScaledPath('MARKER_LOOP', {
         xScaleFactor: 1,
         yScaleFactor: 1,
         containerWidth: element.width,
         containerHeight: element.height,
         position: {
-          mx: 0.0,
-          my: 0.3,
+          mx: ((element.width / 2 + position.loop) / element.width),
+          my: (element.height - 7) / element.height,
         },
       });
 
-      const businessKnowledge = drawPath(p, pathData, {
-        strokeWidth: 2,
-        fill: getFillColor(element, defaultFillColor),
-        stroke: getStrokeColor(element, defaultStrokeColor),
-      });
-
-      renderEmbeddedLabel(p, element, 'center-middle');
-
-      return businessKnowledge;
-    },
-    'dmn:InputData': function (p, element) {
-      const rect = drawRect(p, element.width, element.height, 22, {
-        stroke: getStrokeColor(element, defaultStrokeColor),
-        fill: getFillColor(element, defaultFillColor),
-      });
-
-      renderEmbeddedLabel(p, element, 'center-middle');
-
-      return rect;
-    },
-    'dmn:TextAnnotation': function (p, element) {
-      const style = {
-        fill: 'none',
-        stroke: 'none',
-      };
-
-      const textElement = drawRect(p, element.width, element.height, 0, 0, style);
-
-      const textPathData = pathMap.getScaledPath('TEXT_ANNOTATION', {
-        xScaleFactor: 1,
-        yScaleFactor: 1,
-        containerWidth: element.width,
-        containerHeight: element.height,
-        position: {
-          mx: 0.0,
-          my: 0.0,
-        },
-      });
-
-      drawPath(p, textPathData, {
-        stroke: getStrokeColor(element, defaultStrokeColor),
-      });
-
-      const text = getSemantic(element).text || '';
-
-      renderLabel(p, text, {
-        style: {
-          fill: getLabelColor(element, defaultLabelColor, defaultStrokeColor),
-        },
-        box: element,
-        align: 'left-top',
-        padding: 5,
-      });
-
-      return textElement;
-    },
-    'dmn:Association': function (p, element) {
-      const semantic = getSemantic(element);
-
-      const fill = getFillColor(element, defaultFillColor);
-      const stroke = getStrokeColor(element, defaultStrokeColor);
-      const attrs = {
-        stroke,
-        strokeDasharray: '0.5, 5',
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        fill: 'none',
-      };
-
-      if (semantic.associationDirection === 'One'
-          || semantic.associationDirection === 'Both') {
-        attrs.markerEnd = marker('association-end', fill, stroke);
-      }
-
-      if (semantic.associationDirection === 'Both') {
-        attrs.markerStart = marker('association-start', fill, stroke);
-      }
-
-      return drawLine(p, element.waypoints, attrs);
-    },
-    'dmn:InformationRequirement': function (p, element) {
-      const fill = getFillColor(element, defaultFillColor);
-      const stroke = getStrokeColor(element, defaultStrokeColor);
-      const attrs = {
-        stroke,
-        strokeWidth: 1,
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        markerEnd: marker('information-requirement-end', fill, stroke),
-      };
-
-      return drawLine(p, element.waypoints, attrs);
-    },
-    'dmn:KnowledgeRequirement': function (p, element) {
-      const fill = getFillColor(element, defaultFillColor);
-      const stroke = getStrokeColor(element, defaultStrokeColor);
-      const attrs = {
-        stroke,
-        strokeWidth: 1,
-        strokeDasharray: 5,
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        markerEnd: marker('knowledge-requirement-end', fill, stroke),
-      };
-
-      return drawLine(p, element.waypoints, attrs);
-    },
-    'dmn:AuthorityRequirement': function (p, element) {
-      const fill = getFillColor(element, defaultFillColor);
-      const stroke = getStrokeColor(element, defaultStrokeColor);
-      const attrs = {
-        stroke,
+      drawMarker('loop', parentGfx, markerPath, {
         strokeWidth: 1.5,
-        strokeDasharray: 5,
-        strokeLinecap: 'round',
-        strokeLinejoin: 'round',
-        markerEnd: marker('authority-requirement-end', fill, stroke),
-      };
+        fill: getFillColor(element, defaultFillColor),
+        stroke: getStrokeColor(element, defaultStrokeColor),
+        strokeMiterlimit: 0.5,
+      });
+    },
+    CompensationMarker(parentGfx, element, position) {
+      const markerMath = pathMap.getScaledPath('MARKER_COMPENSATION', {
+        xScaleFactor: 1,
+        yScaleFactor: 1,
+        containerWidth: element.width,
+        containerHeight: element.height,
+        position: {
+          mx: ((element.width / 2 + position.compensation) / element.width),
+          my: (element.height - 13) / element.height,
+        },
+      });
 
-      return drawLine(p, element.waypoints, attrs);
+      drawMarker('compensation', parentGfx, markerMath, {
+        strokeWidth: 1,
+        fill: getFillColor(element, defaultFillColor),
+        stroke: getStrokeColor(element, defaultStrokeColor),
+      });
     },
   };
   function drawShape(parent, element) {
@@ -463,7 +441,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
 
   function drawConnection(parent, element) {
     const { type } = element;
-    const h = handlers[type] || handlers.line;
+    const h = handlers[type];
 
     if (!h) {
       return BaseRenderer.prototype.drawConnection.apply(this, [parent, element]);
