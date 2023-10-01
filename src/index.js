@@ -8,5 +8,5 @@ const editor = new Editor({
   propertiesPanel: { parent: '#properties' },
 });
 editor.get('eventBus').on('selection.changed', (e) => {
-  console.log(e.newSelection[0]);
+  console.log(e.newSelection[0] || editor.get('canvas').getRootElement());
 });

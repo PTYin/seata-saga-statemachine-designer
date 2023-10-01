@@ -87,7 +87,7 @@ export default class PropertiesPanelRenderer {
       this.detach();
     });
 
-    eventBus.on('diagram.init', (event) => {
+    eventBus.on('import.done', (event) => {
       const { element } = event;
 
       if (parent) {
@@ -189,10 +189,9 @@ export default class PropertiesPanelRenderer {
     }
 
     if (isImplicitRoot(element)) {
-      // TODO
+      return;
     }
 
-    console.log('hello, world', this.container);
     render(
       // eslint-disable-next-line react/react-in-jsx-scope
       <PropertiesPanel

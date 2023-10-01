@@ -9,6 +9,6 @@ export default {
   },
 
   getTypeLabel: (element) => {
-    return element.type;
+    return element?.type?.replace(/(\B[A-Z])/g, ' $1').replace(/(\bNon Interrupting)/g, '($1)');
   },
 };

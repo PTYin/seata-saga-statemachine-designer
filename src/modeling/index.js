@@ -7,10 +7,14 @@ import ElementFactory from './ElementFactory';
 import Modeling from './Modeling';
 import SagaFactory from './SagaFactory';
 import SagaRules from './SagaRules';
+import SagaExporter from './SagaExporter';
+import SagaImporter from './SagaImporter';
 
 export default {
   __init__: [
     'modeling',
+    'sagaImporter',
+    'sagaExporter',
     'sagaFactory',
     'sagaRules',
   ],
@@ -22,6 +26,8 @@ export default {
   ],
   elementFactory: ['type', ElementFactory],
   modeling: ['type', Modeling],
+  sagaImporter: ['type', SagaImporter],
+  sagaExporter: ['type', SagaExporter],
   sagaFactory: ['type', SagaFactory],
   sagaRules: ['type', SagaRules],
 };

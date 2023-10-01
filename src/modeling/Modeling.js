@@ -1,13 +1,16 @@
 import inherits from 'inherits-browser';
 
 import BaseModeling from 'diagram-js/lib/features/modeling/Modeling';
+import UpdatePropertiesHandler from './cmd/UpdatePropertiesHandler';
 
 export default function Modeling(
   canvas,
+  commandStack,
   rules,
   injector,
 ) {
   this.canvas = canvas;
+  this.commandStack = commandStack;
   this.rules = rules;
 
   injector.invoke(BaseModeling, this);
@@ -17,6 +20,7 @@ inherits(Modeling, BaseModeling);
 
 Modeling.$inject = [
   'canvas',
+  'commandStack',
   'rules',
   'injector',
 ];
@@ -30,4 +34,19 @@ Modeling.prototype.connect = function (source, target, attrs, hints) {
   }
 
   return this.createConnection(source, target, attrs, rootElement, hints);
+};
+
+Modeling.prototype.getHandlers = function () {
+  const handlers = BaseModeling.prototype.getHandlers.call(this);
+
+  handlers['element.updateProperties'] = UpdatePropertiesHandler;
+
+  return handlers;
+};
+
+Modeling.prototype.updateProperties = function (element, properties) {
+  this.commandStack.execute('element.updateProperties', {
+    element,
+    properties,
+  });
 };

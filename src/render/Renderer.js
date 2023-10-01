@@ -323,7 +323,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   }
 
   handlers = {
-    Connection(p, element) {
+    Transition(p, element) {
       const fill = getFillColor(element, defaultFillColor);
       const stroke = getStrokeColor(element, defaultStrokeColor);
       const attrs = {

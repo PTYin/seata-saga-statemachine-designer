@@ -20,7 +20,7 @@ function canConnect(source, target) {
   if (target.parent !== source.parent || source === target) {
     return false;
   }
-  return { type: 'Connection' };
+  return { type: 'Transition' };
 }
 
 SagaRules.prototype.canConnect = canConnect;

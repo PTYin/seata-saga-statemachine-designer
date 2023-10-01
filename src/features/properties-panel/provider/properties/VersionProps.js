@@ -1,18 +1,16 @@
-import {
-  isTextFieldEntryEdited,
-} from '@bpmn-io/properties-panel';
+import { isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
 import BaseText from './BaseText';
 
-export default function NameProps(props) {
+export default function VersionProps(props) {
   const {
     element,
   } = props;
 
   return [
     {
-      id: 'name',
-      label: 'Name',
+      id: 'version',
+      label: 'Version',
       component: BaseText,
       element,
       isEdited: isTextFieldEntryEdited,

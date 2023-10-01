@@ -25,6 +25,9 @@ import SelectionModule from 'diagram-js/lib/features/selection';
 import SnappingModule from 'diagram-js/lib/features/snapping';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 
+import GridModule from 'diagram-js-grid';
+
+import Io from './features/io';
 import Layout from './features/layout';
 import PropertiesProvider from './features/properties-panel/provider';
 import PropertiesPanel from './features/properties-panel';
@@ -36,6 +39,7 @@ import 'diagram-js/assets/diagram-js.css';
 import '@bpmn-io/properties-panel/assets/properties-panel.css';
 import 'bpmn-font/dist/css/bpmn.css';
 import './index.css';
+import { randomString } from './utils';
 
 /**
  * Our editor constructor
@@ -55,6 +59,7 @@ export default function Editor(options) {
 inherits(Editor, Diagram);
 
 Editor.prototype.modules = [
+  Io,
   Layout,
   PropertiesPanel,
   PropertiesProvider,
@@ -69,6 +74,7 @@ Editor.prototype.modules = [
   ConnectPreviewModule,
   ContextPadModule,
   CreateModule,
+  GridModule,
   GridSnappingModule,
   EditorActionsModule,
   KeyboardModule,
@@ -153,7 +159,19 @@ Editor.prototype.init = function (container, options) {
   // invoke diagram constructor
   Diagram.call(this, diagramOptions);
 
+  // Initialize empty view
+  this.get('sagaImporter').import({
+    Name: `StateMachine-${randomString()}`,
+    Type: 'StateMachine',
+    Comment: 'This state machine is modeled by designer tools.',
+    Version: '0.0.1',
+  });
+
   if (options && options.container) {
     this.attachTo(options.container);
   }
+};
+
+Editor.prototype.export = function () {
+  this.get('sagaExporter').export();
 };
