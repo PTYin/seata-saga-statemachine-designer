@@ -1,21 +1,5 @@
-import {
-  reduce,
-  keys,
-  forEach,
-} from 'min-dash';
-
-function getProperties(businessObject, propertyNames) {
-  return reduce(propertyNames, (result, key) => {
-    result[key] = businessObject[key];
-    return result;
-  }, {});
-}
-
-function setProperties(businessObject, properties) {
-  forEach(properties, (value, key) => {
-    businessObject[key] = value;
-  });
-}
+import { keys } from 'min-dash';
+import { getProperties, setProperties } from '../../utils';
 
 export default function UpdatePropertiesHandler() {
 }

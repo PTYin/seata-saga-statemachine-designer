@@ -38,7 +38,7 @@ const BASE_TEMPLATE = {
 const TASK_TEMPLATE = {
   ...BASE_TEMPLATE,
   Input: [],
-  Output: {},
+  Output: [],
   Retry: {
     Exceptions: [],
     IntervalSeconds: null,

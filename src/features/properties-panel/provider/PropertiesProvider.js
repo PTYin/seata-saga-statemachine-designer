@@ -3,9 +3,8 @@ import { Group, ListGroup } from '@bpmn-io/properties-panel';
 import NameProps from './properties/NameProps';
 import CommentProps from './properties/CommentProps';
 import VersionProps from './properties/VersionProps';
-import InputProps from './properties/task/InputProps';
 import SagaFactory from '../../../modeling/SagaFactory';
-import TaskProps from './properties/task/TaskProps';
+import IoProps from './properties/task/IoProps';
 
 function GeneralGroup(element) {
   const entries = [
@@ -27,7 +26,7 @@ function GeneralGroup(element) {
 
 function TaskGroup(element) {
   const items = [
-    ...TaskProps({ element }),
+    ...IoProps({ element }),
   ];
 
   return {

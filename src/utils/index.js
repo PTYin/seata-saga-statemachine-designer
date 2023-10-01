@@ -1,5 +1,6 @@
 import { useContext } from '@bpmn-io/properties-panel/preact/hooks';
 import PropertiesPanelContext from '../features/properties-panel/PropertiesPanelContext';
+import { forEach, reduce } from 'min-dash';
 
 /**
  * Returns a random generated string for initial decision definition id.
@@ -20,4 +21,17 @@ export function useService(type, strict) {
   const { getService } = useContext(PropertiesPanelContext);
 
   return getService(type, strict);
+}
+
+export function getProperties(businessObject, propertyNames) {
+  return reduce(propertyNames, (result, key) => {
+    result[key] = businessObject[key];
+    return result;
+  }, {});
+}
+
+export function setProperties(businessObject, properties) {
+  forEach(properties, (value, key) => {
+    businessObject[key] = value;
+  });
 }

@@ -2,6 +2,7 @@ import inherits from 'inherits-browser';
 
 import BaseModeling from 'diagram-js/lib/features/modeling/Modeling';
 import UpdatePropertiesHandler from './cmd/UpdatePropertiesHandler';
+import UpdateCompositePropertiesHandler from './cmd/UpdateCompositePropertiesHandler';
 
 export default function Modeling(
   canvas,
@@ -40,6 +41,7 @@ Modeling.prototype.getHandlers = function () {
   const handlers = BaseModeling.prototype.getHandlers.call(this);
 
   handlers['element.updateProperties'] = UpdatePropertiesHandler;
+  handlers['element.updateCompositeProperties'] = UpdateCompositePropertiesHandler;
 
   return handlers;
 };
@@ -48,5 +50,17 @@ Modeling.prototype.updateProperties = function (element, properties) {
   this.commandStack.execute('element.updateProperties', {
     element,
     properties,
+  });
+};
+
+Modeling.prototype.updateCompositeProperties = function (
+  element,
+  compositeProperty,
+  subProperties,
+) {
+  this.commandStack.execute('element.updateCompositeProperties', {
+    element,
+    compositeProperty,
+    subProperties,
   });
 };
