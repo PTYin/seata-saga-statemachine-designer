@@ -1,21 +1,19 @@
 {
   "presets": [
+    "@babel/preset-env",
     [
-      "@babel/preset-env",
+      "@babel/preset-react",
       {
-        "modules": false,
-        "useBuiltIns": "usage",
-        "corejs": "core-js@3"
+        "runtime": "automatic"
       }
-    ],
-    "@babel/preset-react"
+    ]
   ],
   "plugins": [
-    "@babel/plugin-transform-runtime",
     [
-      "@babel/plugin-proposal-class-properties",
+      "@babel/plugin-transform-react-jsx",
       {
-        "loose": true
+        "importSource": "@bpmn-io/properties-panel/preact",
+        "runtime": "automatic"
       }
     ]
   ]

@@ -26,11 +26,14 @@ import SnappingModule from 'diagram-js/lib/features/snapping';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 
 import Layout from './features/layout';
+import PropertiesProvider from './features/properties-panel/provider';
+import PropertiesPanel from './features/properties-panel';
 import Modeling from './modeling';
 import Providers from './providers';
 import Render from './render';
 
 import 'diagram-js/assets/diagram-js.css';
+import '@bpmn-io/properties-panel/assets/properties-panel.css';
 import 'bpmn-font/dist/css/bpmn.css';
 import './index.css';
 
@@ -53,6 +56,8 @@ inherits(Editor, Diagram);
 
 Editor.prototype.modules = [
   Layout,
+  PropertiesPanel,
+  PropertiesProvider,
   Modeling,
   Providers,
   Render,

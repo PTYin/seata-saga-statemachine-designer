@@ -137,7 +137,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
         ref: { x: 12, y: 10 },
         scale: 0.5,
       });
-    } else if (type === 'information-requirement-end') {
+    } else if (type === 'connection-end') {
       const informationRequirementEnd = svgCreate('path');
       svgAttr(informationRequirementEnd, { d: 'M 1 5 L 11 10 L 1 15 Z' });
 
@@ -232,7 +232,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   }
 
   function renderEmbeddedLabel(p, element, align, options) {
-    const { name } = element.businessObject;
+    const { Name } = element.businessObject;
 
     options = assign({
       box: element,
@@ -243,7 +243,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
       },
     }, options);
 
-    return renderLabel(p, name, options);
+    return renderLabel(p, Name, options);
   }
 
   function drawPath(p, d, attrs) {

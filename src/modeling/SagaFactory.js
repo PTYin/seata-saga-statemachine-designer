@@ -1,5 +1,5 @@
-import { assign, pick } from 'min-dash';
-import randomString from '../utils';
+import { assign } from 'min-dash';
+import { randomString } from '../utils';
 
 export default function SagaFactory() {
 }
@@ -30,7 +30,7 @@ SagaFactory.prototype.create = function (type) {
   }
 
   assign(businessObject, this.BASE_PROPERTIES);
-  businessObject.name = `${type}-${randomString()}`;
+  businessObject.Name = `${type}-${randomString()}`;
   if (this.isTask(type)) {
     assign(businessObject, this.TASK_PROPERTIES);
   }
