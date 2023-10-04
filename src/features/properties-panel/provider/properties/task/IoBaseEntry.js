@@ -56,30 +56,38 @@ export function CollapsibleParameters(props) {
   });
 }
 
-export function List(props) {
-  const { element, type, label } = props;
+export function IoList(props) {
+  const {
+    element,
+    type,
+    label,
+    parameterKey,
+    entryProps,
+  } = props;
 
   const id = `${element.id}-${type}-mapping`;
 
   const modeling = useService('modeling');
-  let inputList = element?.businessObject?.Input;
-  if (inputList === undefined || inputList === null) {
-    inputList = [];
-    modeling.updateProperties(element, { Input: inputList });
+  let ioList = element.businessObject[parameterKey];
+  if (ioList === undefined || ioList === null) {
+    ioList = [];
+    modeling.updateProperties(element, { [parameterKey]: ioList });
   }
 
   return ListEntry({
     element,
-    autoFocusEntry: `[data-entry-id="${element.id}-collapsible-input-${inputList.length - 1}"] input`,
+    autoFocusEntry: `[data-entry-id="${element.id}-collapsible-${type}-${ioList.length - 1}"] input`,
     id,
     label,
-    items: inputList,
+    parameterKey,
+    entryProps,
+    items: ioList,
     component: CollapsibleParameters,
     onAdd: () => {
-      modeling.updateProperties(element, { Input: [...inputList, { value: '' }] });
+      modeling.updateProperties(element, { [parameterKey]: [...ioList, { value: '' }] });
     },
     onRemove(item) {
-      modeling.updateProperties(element, { Input: inputList.filter((input) => input !== item) });
+      modeling.updateProperties(element, { [parameterKey]: ioList.filter((io) => io !== item) });
     },
   });
 }

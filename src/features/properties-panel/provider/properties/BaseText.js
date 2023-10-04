@@ -9,6 +9,8 @@ export default function BaseText(props) {
     element,
     id,
     label,
+    parameterKey,
+    ...additionalProps
   } = props;
 
   const debounce = useService('debounceInput');
@@ -18,15 +20,16 @@ export default function BaseText(props) {
     element,
     id,
     label,
+    ...additionalProps,
     debounce,
     getValue: (e) => {
       if (e.businessObject) {
-        return e.businessObject[label];
+        return e.businessObject[parameterKey];
       }
       return null;
     },
     setValue: (value) => {
-      modeling.updateProperties(element, { [label]: value });
+      modeling.updateProperties(element, { [parameterKey]: value });
     },
   };
 

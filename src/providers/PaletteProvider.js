@@ -56,8 +56,9 @@ PaletteProvider.prototype.getPaletteEntries = function () {
       group: 'tools',
       separator: true,
     },
+    'create-start': createAction('StartState', 'start', 'bpmn-icon-start-event-none', 'Create Start'),
     'create-service-task': createAction('ServiceTask', 'task', 'bpmn-icon-service-task', 'Create ServiceTask'),
-    'create-script-task': createAction('ScriptTask', 'task', 'bpmn-icon-script-task', 'Create ScriptTask'),
-    'create-choice': createAction('Choice', 'gateway', 'bpmn-icon-gateway-xor', 'Create Choice'),
+    'create-success': createAction('Succeed', 'end', 'bpmn-icon-end-event-none', 'Create Succeed'),
+    'create-fail': createAction('Fail', 'end', 'bpmn-icon-end-event-error', 'Create Fail'),
   };
 };

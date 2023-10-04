@@ -36,7 +36,7 @@ function elementExists(element, elementRegistry) {
  * @param {Object} props
  * @param {djs.model.Base|Array<djs.model.Base>} [props.element]
  * @param {Injector} props.injector
- * @param { (djs.model.Base) => Array<PropertiesProvider> } props.getProviders
+ * @param { (djs.model.BaseSpec) => Array<PropertiesProvider> } props.getProviders
  * @param {Object} props.layoutConfig
  * @param {Object} props.descriptionConfig
  */

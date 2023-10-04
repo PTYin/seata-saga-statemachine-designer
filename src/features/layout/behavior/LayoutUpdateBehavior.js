@@ -48,7 +48,7 @@ LayoutUpdateBehavior.$inject = ['injector'];
 
 LayoutUpdateBehavior.prototype.updateBounds = function (shape) {
   const { businessObject } = shape;
-  const { bounds } = businessObject.Style;
+  const { bounds } = businessObject.style;
 
   // update bounds
   assign(bounds, {
@@ -62,7 +62,7 @@ LayoutUpdateBehavior.prototype.updateBounds = function (shape) {
 LayoutUpdateBehavior.prototype.updateConnectionWaypoints = function (context) {
   const { connection } = context;
   const { businessObject } = connection;
-  const { waypoints } = businessObject.Style;
+  const { waypoints } = businessObject.style;
 
   assign(waypoints, connection.waypoints);
 };
@@ -72,6 +72,6 @@ LayoutUpdateBehavior.prototype.updateConnectionSourceTarget = function (context)
   const { businessObject } = connection;
   const { source, newSource, target, newTarget } = context;
 
-  businessObject.Style.source = newSource || source;
-  businessObject.Style.target = newTarget || target;
+  businessObject.style.source = newSource || source;
+  businessObject.style.target = newTarget || target;
 };

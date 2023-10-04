@@ -11,6 +11,7 @@ export default function VersionProps(props) {
     {
       id: 'version',
       label: 'Version',
+      parameterKey: 'version',
       component: BaseText,
       element,
       isEdited: isTextFieldEntryEdited,

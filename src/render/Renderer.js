@@ -1,26 +1,14 @@
 import inherits from 'inherits-browser';
 
-import {
-  isObject,
-  assign, forEach,
-} from 'min-dash';
+import { assign, forEach, isObject } from 'min-dash';
 
-import {
-  attr as domAttr,
-  query as domQuery,
-} from 'min-dom';
+import { attr as domAttr, query as domQuery } from 'min-dom';
 
-import {
-  append as svgAppend,
-  attr as svgAttr,
-  create as svgCreate,
-} from 'tiny-svg';
+import { append as svgAppend, attr as svgAttr, create as svgCreate } from 'tiny-svg';
 
 import BaseRenderer from 'diagram-js/lib/draw/BaseRenderer';
 
-import {
-  createLine,
-} from 'diagram-js/lib/util/RenderUtil';
+import { createLine } from 'diagram-js/lib/util/RenderUtil';
 
 const BLACK = 'hsl(225, 10%, 15%)';
 const TASK_BORDER_RADIUS = 10;
@@ -191,6 +179,41 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
     return `url(#${id})`;
   }
 
+  function drawCircle(parentGfx, width, height, offset, attrs) {
+    if (isObject(offset)) {
+      attrs = offset;
+      offset = 0;
+    }
+
+    offset = offset || 0;
+
+    attrs = computeStyle(attrs, {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      stroke: BLACK,
+      strokeWidth: 2,
+      fill: 'white',
+    });
+
+    if (attrs.fill === 'none') {
+      delete attrs.fillOpacity;
+    }
+
+    const cx = width / 2;
+    const cy = height / 2;
+
+    const circle = svgCreate('circle', {
+      cx,
+      cy,
+      r: Math.round((width + height) / 4 - offset),
+      ...attrs,
+    });
+
+    svgAppend(parentGfx, circle);
+
+    return circle;
+  }
+
   function drawRect(p, width, height, r, offset, attrs) {
     if (isObject(offset)) {
       attrs = offset;
@@ -232,7 +255,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
   }
 
   function renderEmbeddedLabel(p, element, align, options) {
-    const { Name } = element.businessObject;
+    const { name } = element.businessObject;
 
     options = assign({
       box: element,
@@ -243,7 +266,7 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
       },
     }, options);
 
-    return renderLabel(p, Name, options);
+    return renderLabel(p, name, options);
   }
 
   function drawPath(p, d, attrs) {
@@ -335,6 +358,39 @@ export default function Renderer(config, eventBus, pathMap, styles, textRenderer
       };
 
       return drawLine(p, element.waypoints, attrs);
+    },
+    StartState(parentGfx, element) {
+      return drawCircle(parentGfx, element.width, element.height, {
+        fill: getFillColor(element, defaultFillColor),
+        stroke: getStrokeColor(element, defaultStrokeColor),
+      });
+    },
+    Succeed(parentGfx, element) {
+      return drawCircle(parentGfx, element.width, element.height, {
+        strokeWidth: 4,
+        fill: getFillColor(element, defaultFillColor),
+        stroke: getStrokeColor(element, defaultStrokeColor),
+      });
+    },
+    Fail(parentGfx, element) {
+      const circle = handlers.Succeed(parentGfx, element);
+      const pathData = pathMap.getScaledPath('EVENT_ERROR', {
+        xScaleFactor: 1.1,
+        yScaleFactor: 1.1,
+        containerWidth: element.width,
+        containerHeight: element.height,
+        position: {
+          mx: 0.2,
+          my: 0.722,
+        },
+      });
+      drawPath(parentGfx, pathData, {
+        strokeWidth: 1,
+        fill: getStrokeColor(element, defaultStrokeColor),
+        stroke: getStrokeColor(element, defaultStrokeColor),
+      });
+
+      return circle;
     },
     Task(parentGfx, element) {
       const attrs = {

@@ -5,6 +5,11 @@ import CommentProps from './properties/CommentProps';
 import VersionProps from './properties/VersionProps';
 import SagaFactory from '../../../modeling/SagaFactory';
 import IoProps from './properties/task/IoProps';
+import ServiceNameProps from './properties/task/service-task/ServiceNameProps';
+import ServiceTypeProps from './properties/task/service-task/ServiceTypeProps';
+import ServiceMethodProps from './properties/task/service-task/ServiceMethodProps';
+import ErrorCodeProps from './properties/end/ErrorCodeProps';
+import ErrorMessageProps from './properties/end/ErrorMessageProps';
 
 function GeneralGroup(element) {
   const entries = [
@@ -14,6 +19,11 @@ function GeneralGroup(element) {
 
   if (SagaFactory.prototype.isStateMachine(element.type)) {
     entries.push(...VersionProps({ element }));
+  }
+
+  if (SagaFactory.prototype.isConnection(element.type)
+    || SagaFactory.prototype.isStartState(element.type)) {
+    return null;
   }
 
   return {
@@ -29,6 +39,10 @@ function TaskGroup(element) {
     ...IoProps({ element }),
   ];
 
+  if (!SagaFactory.prototype.isTask(element.type)) {
+    return null;
+  }
+
   return {
     id: 'task',
     label: 'Task',
@@ -37,14 +51,50 @@ function TaskGroup(element) {
   };
 }
 
+function ServiceTaskGroup(element) {
+  const entries = [
+    ...ServiceNameProps({ element }),
+    ...ServiceMethodProps({ element }),
+    ...ServiceTypeProps({ element }),
+  ];
+
+  if (element.type !== 'ServiceTask') {
+    return null;
+  }
+
+  return {
+    id: 'serviceTask',
+    label: 'Service Task',
+    entries,
+    component: Group,
+  };
+}
+
+function FailEndGroup(element) {
+  const entries = [
+    ...ErrorCodeProps({ element }),
+    ...ErrorMessageProps({ element }),
+  ];
+
+  if (element.type !== 'Fail') {
+    return null;
+  }
+
+  return {
+    id: 'failEnd',
+    label: 'Fail End',
+    entries,
+    component: Group,
+  };
+}
+
 function getGroups(element) {
   const groups = [
     GeneralGroup(element),
+    TaskGroup(element),
+    ServiceTaskGroup(element),
+    FailEndGroup(element),
   ];
-
-  if (SagaFactory.prototype.isTask(element.type)) {
-    groups.push(TaskGroup(element));
-  }
 
   // contract: if a group returns null, it should not be displayed at all
   return groups.filter((group) => group !== null);

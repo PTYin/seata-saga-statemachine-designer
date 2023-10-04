@@ -2,18 +2,18 @@ import {
   isTextFieldEntryEdited,
 } from '@bpmn-io/properties-panel';
 
-import BaseText from './BaseText';
+import BaseText from '../../BaseText';
 
-export default function NameProps(props) {
+export default function ServiceMethodProps(props) {
   const {
     element,
   } = props;
 
   return [
     {
-      id: 'name',
-      label: 'Name',
-      parameterKey: 'name',
+      id: 'serviceMethod',
+      label: 'Service Method',
+      parameterKey: 'serviceMethod',
       component: BaseText,
       element,
       isEdited: isTextFieldEntryEdited,

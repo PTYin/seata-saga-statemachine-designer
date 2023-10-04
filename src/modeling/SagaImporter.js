@@ -6,7 +6,7 @@ import {
 // helper /////
 function elementData(semantic, attrs) {
   return assign({
-    type: semantic.Type,
+    type: semantic.type,
     businessObject: semantic,
   }, attrs);
 }
@@ -25,11 +25,13 @@ function collectWaypoints(edge) {
 }
 
 export default function SagaImporter(
+  sagaFactory,
   eventBus,
   canvas,
   elementFactory,
   elementRegistry,
 ) {
+  this.sagaFactory = sagaFactory;
   this.eventBus = eventBus;
   this.canvas = canvas;
   this.elementRegistry = elementRegistry;
@@ -37,6 +39,7 @@ export default function SagaImporter(
 }
 
 SagaImporter.$inject = [
+  'sagaFactory',
   'eventBus',
   'canvas',
   'elementFactory',
@@ -50,22 +53,23 @@ SagaImporter.prototype.import = function (definitions) {
   this.eventBus.fire('import.start', { definitions });
 
   try {
-    this.root(definitions);
+    const bo = this.sagaFactory.create('StateMachine');
+    bo.importJson(definitions);
+    this.root(bo);
+    // Add start state
+    this.add({ type: 'StartState', style: definitions.style });
     forEach(definitions.States, (state) => {
       console.log(state);
     });
   } catch (e) {
     error = e;
-    console.error(e);
   }
 
   this.eventBus.fire('import.done', { error, warnings });
 };
 
 SagaImporter.prototype.root = function (semantic) {
-  const root = assign({}, semantic);
-  delete root.States;
-  const element = this.elementFactory.createRoot(elementData(root));
+  const element = this.elementFactory.createRoot(elementData(semantic));
 
   this.canvas.setRootElement(element);
 
@@ -78,13 +82,13 @@ SagaImporter.prototype.root = function (semantic) {
 SagaImporter.prototype.add = function (semantic) {
   const { elementFactory } = this;
   const { canvas } = this;
-  const { Style } = semantic;
+  const { style } = semantic;
 
   let element; let waypoints; let source; let target; let elementDefinition; let
     bounds;
 
-  if (Style.type === 'Node') {
-    bounds = Style.bounds;
+  if (style.type === 'Node') {
+    bounds = style.bounds;
 
     elementDefinition = elementData(semantic, {
       x: Math.round(bounds.x),
@@ -95,8 +99,8 @@ SagaImporter.prototype.add = function (semantic) {
     element = elementFactory.createShape(elementDefinition);
 
     canvas.addShape(element);
-  } else if (Style.type === 'Edge') {
-    waypoints = collectWaypoints(Style);
+  } else if (style.type === 'Edge') {
+    waypoints = collectWaypoints(style);
 
     source = this.getSource(semantic);
     target = this.getTarget(semantic);

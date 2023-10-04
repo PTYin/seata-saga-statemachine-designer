@@ -1,78 +1,24 @@
-import { assign } from 'min-dash';
-import { randomString } from '../utils';
+import Transition from './spec/Transition';
+import StateMachine from './spec/StateMachine';
+import ServiceTask from './spec/ServiceTask';
+import StartState from './spec/StartState';
+import SucceedEnd from './spec/SucceedEnd';
+import FailEnd from './spec/FailEnd';
 
 export default function SagaFactory() {
+  const typeToSpec = new Map();
+  typeToSpec.set('Transition', Transition);
+  typeToSpec.set('StartState', StartState);
+  typeToSpec.set('StateMachine', StateMachine);
+  typeToSpec.set('ServiceTask', ServiceTask);
+  typeToSpec.set('Succeed', SucceedEnd);
+  typeToSpec.set('Fail', FailEnd);
+  this.typeToSpec = typeToSpec;
 }
 
-const NODE_STYLE_TEMPLATE = {
-  type: 'Node',
-  bounds: {},
-};
-
-const EDGE_STYLE_TEMPLATE = {
-  type: 'Edge',
-  source: '',
-  target: '',
-  waypoints: [],
-};
-
-const TRANSITION_TEMPLATE = {
-  Style: EDGE_STYLE_TEMPLATE,
-};
-
-const STATE_MACHINE_TEMPLATE = {
-  Name: '',
-  Type: 'StateMachine',
-  Comment: '',
-  Extensions: {},
-};
-
-const BASE_TEMPLATE = {
-  Name: '',
-  Type: '',
-  Comment: '',
-  Extensions: {},
-  Style: NODE_STYLE_TEMPLATE,
-};
-
-const TASK_TEMPLATE = {
-  ...BASE_TEMPLATE,
-  Input: [],
-  Output: [],
-  Retry: {
-    Exceptions: [],
-    IntervalSeconds: null,
-    MaxAttempts: null,
-    BackoffRate: null,
-  },
-  // TODO
-};
-
 SagaFactory.prototype.create = function (type) {
-  const businessObject = {};
-
-  if (type === 'Transition') {
-    assign(businessObject, TRANSITION_TEMPLATE);
-    return businessObject;
-  }
-
-  if (this.isStateMachine(type)) {
-    assign(businessObject, STATE_MACHINE_TEMPLATE);
-  } else if (this.isTask(type)) {
-    assign(businessObject, TASK_TEMPLATE);
-  } else {
-    assign(businessObject, BASE_TEMPLATE);
-  }
-
-  if (!businessObject.Type) {
-    businessObject.Type = type;
-  }
-
-  if (!businessObject.Name) {
-    businessObject.Name = `${type}-${randomString()}`;
-  }
-
-  return businessObject;
+  const Spec = this.typeToSpec.get(type);
+  return new Spec();
 };
 
 SagaFactory.prototype.isStateMachine = function (type) {
@@ -84,12 +30,21 @@ SagaFactory.prototype.isTask = function (type) {
     || type === 'Task';
 };
 
-const SERVICE_TASK_SIZE = { width: 180, height: 80 };
+SagaFactory.prototype.isStartState = function (type) {
+  return type === 'StartState';
+};
+
+SagaFactory.prototype.isConnection = function (type) {
+  return type === 'Transition';
+};
 
 SagaFactory.prototype.getDefaultSize = function (semantic) {
-  if (semantic.type === 'ServiceTask') {
-    return SERVICE_TASK_SIZE;
+  if (semantic.DEFAULT_SIZE) {
+    return semantic.DEFAULT_SIZE;
   }
 
-  return { width: 100, height: 80 };
+  return {
+    width: 100,
+    height: 80,
+  };
 };

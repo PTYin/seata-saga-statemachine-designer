@@ -162,9 +162,17 @@ Editor.prototype.init = function (container, options) {
   // Initialize empty view
   this.get('sagaImporter').import({
     Name: `StateMachine-${randomString()}`,
-    Type: 'StateMachine',
     Comment: 'This state machine is modeled by designer tools.',
     Version: '0.0.1',
+    style: {
+      type: 'Node',
+      bounds: {
+        x: 200,
+        y: 200,
+        width: 36,
+        height: 36,
+      },
+    },
   });
 
   if (options && options.container) {

@@ -6,28 +6,24 @@ import {
 import { useService } from '../../../../utils';
 
 function Comment(props) {
-  const {
-    element,
-    id,
-    label,
-  } = props;
+  const { element } = props;
 
   const debounce = useService('debounceInput');
   const modeling = useService('modeling');
 
   const options = {
     element,
-    id,
-    label,
+    id: 'comment',
+    label: 'Comment',
     debounce,
     getValue: (e) => {
       if (e.businessObject) {
-        return e.businessObject[label];
+        return e.businessObject.comment;
       }
       return null;
     },
     setValue: (value) => {
-      modeling.updateProperties(element, { [label]: value });
+      modeling.updateProperties(element, { comment: value });
     },
   };
 
@@ -41,8 +37,6 @@ export default function CommentProps(props) {
 
   return [
     {
-      id: 'comment',
-      label: 'Comment',
       component: Comment,
       element,
       isEdited: isTextFieldEntryEdited,
