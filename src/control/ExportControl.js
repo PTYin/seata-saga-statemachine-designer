@@ -3,16 +3,16 @@ import React from '@bpmn-io/properties-panel/preact/compat';
 export default function ExportControl(props) {
   const { editor } = props;
 
-  function download(data) {
+  function download(data, name, type) {
     const a = document.createElement('a');
 
     a.setAttribute(
       'href',
-      `data:text/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(data))}`,
+      `data:text/${type};charset=UTF-8,${encodeURIComponent(data)}`,
     );
     a.setAttribute('target', '_blank');
-    a.setAttribute('dataTrack', 'diagram:download-json');
-    a.setAttribute('download', `${data.Name}.json`);
+    a.setAttribute('dataTrack', `diagram:download-${type}`);
+    a.setAttribute('download', `${name}.${type}`);
 
     document.body.appendChild(a);
     a.click();
@@ -26,7 +26,10 @@ export default function ExportControl(props) {
           id="export-json"
           type="button"
           title="Export as state machine definition"
-          onClick={() => download(editor.export())}
+          onClick={() => {
+            const raw = editor.export();
+            download(JSON.stringify(raw), raw.Name, 'json');
+          }}
         >
           <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="1em">
             <path
@@ -41,6 +44,10 @@ export default function ExportControl(props) {
           id="export-svg"
           type="button"
           title="Export as image"
+          onClick={() => {
+            const name = editor.get('canvas').getRootElement()?.businessObject?.name || 'diagram';
+            download(editor.exportSvg(), name, 'svg');
+          }}
         >
           <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="1em">
             <path
