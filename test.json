@@ -2,6 +2,7 @@
   "Name": "StateMachine",
   "Comment": "This state machine is modeled by designer tools.",
   "Version": "0.0.1",
+  "StartState": "ServiceTask-nrzlrnz",
   "style": {
     "bounds": {
       "x": 200,
@@ -10,16 +11,36 @@
       "height": 36
     }
   },
+  "edge": {
+    "style": {
+      "waypoints": [
+        {
+          "original": {
+            "x": 236,
+            "y": 218
+          },
+          "x": 236,
+          "y": 218
+        },
+        {
+          "x": 290,
+          "y": 218
+        },
+        {
+          "original": {
+            "x": 310,
+            "y": 218
+          },
+          "x": 310,
+          "y": 218
+        }
+      ],
+      "target": "ServiceTask-nrzlrnz"
+    },
+    "type": "Transition"
+  },
   "States": {
     "ServiceTask-nrzlrnz": {
-      "style": {
-        "bounds": {
-          "x": 310,
-          "y": 178,
-          "width": 100,
-          "height": 80
-        }
-      },
       "Type": "ServiceTask",
       "Name": "ServiceTask-nrzlrnz",
       "Input": [
@@ -31,6 +52,14 @@
       "ServiceName": "DemoService",
       "ServiceMethod": "foo",
       "Next": "Succeed-pevcj3r",
+      "style": {
+        "bounds": {
+          "x": 310,
+          "y": 178,
+          "width": 100,
+          "height": 80
+        }
+      },
       "edge": {
         "Succeed-pevcj3r": {
           "style": {
@@ -64,6 +93,8 @@
       }
     },
     "Succeed-pevcj3r": {
+      "Type": "Succeed",
+      "Name": "Succeed-pevcj3r",
       "style": {
         "bounds": {
           "x": 482,
@@ -71,38 +102,7 @@
           "width": 36,
           "height": 36
         }
-      },
-      "Type": "Succeed",
-      "Name": "Succeed-pevcj3r"
+      }
     }
-  },
-  "StartState": "ServiceTask-nrzlrnz",
-  "edge": {
-    "style": {
-      "waypoints": [
-        {
-          "original": {
-            "x": 236,
-            "y": 218
-          },
-          "x": 236,
-          "y": 218
-        },
-        {
-          "x": 290,
-          "y": 218
-        },
-        {
-          "original": {
-            "x": 310,
-            "y": 218
-          },
-          "x": 310,
-          "y": 218
-        }
-      ],
-      "target": "ServiceTask-nrzlrnz"
-    },
-    "type": "Transition"
   }
 }
