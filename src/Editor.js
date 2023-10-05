@@ -27,10 +27,7 @@ import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 
 import GridModule from 'diagram-js-grid';
 
-import Io from './features/io';
 import Layout from './features/layout';
-import PropertiesProvider from './features/properties-panel/provider';
-import PropertiesPanel from './features/properties-panel';
 import Modeling from './modeling';
 import Providers from './providers';
 import Render from './render';
@@ -49,20 +46,14 @@ import { randomString } from './utils';
  * @return {Diagram}
  */
 export default function Editor(options) {
-  const {
-    container,
-  } = options;
   this.container = this.createContainer();
-  this.init(container, options);
+  this.init(this.container, options);
 }
 
 inherits(Editor, Diagram);
 
 Editor.prototype.modules = [
-  Io,
   Layout,
-  PropertiesPanel,
-  PropertiesProvider,
   Modeling,
   Providers,
   Render,
@@ -94,7 +85,7 @@ Editor.prototype.modules = [
 
 Editor.prototype.createContainer = function () {
   return domify(
-    '<div class="statemachine-designer-container"></div>',
+    '<div class="statemachine-designer-container" style="width: 100%; height: 100%"></div>',
   );
 };
 
@@ -165,7 +156,6 @@ Editor.prototype.init = function (container, options) {
     Comment: 'This state machine is modeled by designer tools.',
     Version: '0.0.1',
     style: {
-      type: 'Node',
       bounds: {
         x: 200,
         y: 200,
@@ -178,8 +168,19 @@ Editor.prototype.init = function (container, options) {
   if (options && options.container) {
     this.attachTo(options.container);
   }
+
+  this.get('eventBus').fire('editor.attached');
+};
+
+Editor.prototype.clear = function () {
+  Diagram.prototype.clear.call(this);
+};
+
+Editor.prototype.import = function (definitions) {
+  this.clear();
+  this.get('sagaImporter').import(definitions);
 };
 
 Editor.prototype.export = function () {
-  this.get('sagaExporter').export();
+  return this.get('sagaExporter').export();
 };

@@ -1,7 +1,8 @@
-import { randomString } from '../../utils';
-import BaseSpec from './BaseSpec';
+import { assign } from 'min-dash';
+import { randomString } from '../utils';
+import Node from './style/Node';
 
-export default class StateMachine extends BaseSpec {
+export default class State extends Node {
   /**
    * @type {string}
    */
@@ -12,29 +13,23 @@ export default class StateMachine extends BaseSpec {
    */
   comment;
 
-  /**
-   * @type {string}
-   */
-  version;
-
   constructor() {
     super();
     this.name = `${this.type}-${randomString()}`;
   }
 
   importJson(json) {
+    super.importJson(json);
     this.name = json.Name;
     this.comment = json.Comment;
-    this.version = json.Version;
   }
 
   exportJson() {
-    return {
+    const json = super.exportJson();
+    return assign(json, {
+      Type: this.type,
       Name: this.name,
       Comment: this.comment,
-      Version: this.version,
-    };
+    });
   }
 }
-
-StateMachine.prototype.type = 'StateMachine';

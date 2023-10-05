@@ -4,7 +4,7 @@ export default class StartState extends Node {
 
 }
 
-StartState.prototype.type = 'Start';
+StartState.prototype.type = 'StartState';
 
 StartState.prototype.DEFAULT_SIZE = {
   width: 36,

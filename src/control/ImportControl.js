@@ -1,7 +1,7 @@
 import React from '@bpmn-io/properties-panel/preact/compat';
 
 export default function ImportControl(props) {
-  const { sagaImporter } = props;
+  const { editor } = props;
   const inputRef = React.useRef(null);
 
   function onOpenFileChange(e) {
@@ -12,7 +12,7 @@ export default function ImportControl(props) {
       reader.readAsText(localFile);
       reader.onload = (event) => {
         data = JSON.parse(event.target.result);
-        sagaImporter.import(data);
+        editor.import(data);
       };
     }
   }

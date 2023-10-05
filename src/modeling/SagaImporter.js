@@ -2,6 +2,7 @@ import {
   assign, forEach,
   map,
 } from 'min-dash';
+import StartState from '../spec/StartState';
 
 // helper /////
 function elementData(semantic, attrs) {
@@ -12,7 +13,7 @@ function elementData(semantic, attrs) {
 }
 
 function collectWaypoints(edge) {
-  const waypoints = edge.waypoint;
+  const { waypoints } = edge;
 
   if (waypoints) {
     return map(waypoints, (waypoint) => {
@@ -53,16 +54,40 @@ SagaImporter.prototype.import = function (definitions) {
   this.eventBus.fire('import.start', { definitions });
 
   try {
-    const bo = this.sagaFactory.create('StateMachine');
-    bo.importJson(definitions);
-    this.root(bo);
+    const root = this.sagaFactory.create('StateMachine');
+    root.importJson(definitions);
+    this.root(root);
+
     // Add start state
-    this.add({ type: 'StartState', style: definitions.style });
-    forEach(definitions.States, (state) => {
-      console.log(state);
+    const start = this.sagaFactory.create('StartState');
+    start.importJson(definitions);
+    this.add(start);
+
+    const edges = [];
+    forEach(definitions.States, (semantic) => {
+      const state = this.sagaFactory.create(semantic.Type);
+      state.importJson(semantic);
+      this.add(state);
+      if (semantic.edge) {
+        edges.push(...Object.values(semantic.edge));
+      }
+    });
+
+    // Add start edge
+    if (definitions.edge) {
+      const startEdge = this.sagaFactory.create('Transition');
+      startEdge.importJson(definitions.edge);
+      this.add(startEdge, { source: start });
+    }
+
+    forEach(edges, (semantic) => {
+      const transition = this.sagaFactory.create(semantic.type);
+      transition.importJson(semantic);
+      this.add(transition);
     });
   } catch (e) {
     error = e;
+    console.error(error);
   }
 
   this.eventBus.fire('import.done', { error, warnings });
@@ -79,7 +104,7 @@ SagaImporter.prototype.root = function (semantic) {
 /**
  * Add drd element (semantic) to the canvas.
  */
-SagaImporter.prototype.add = function (semantic) {
+SagaImporter.prototype.add = function (semantic, attrs = {}) {
   const { elementFactory } = this;
   const { canvas } = this;
   const { style } = semantic;
@@ -102,8 +127,10 @@ SagaImporter.prototype.add = function (semantic) {
   } else if (style.type === 'Edge') {
     waypoints = collectWaypoints(style);
 
-    source = this.getSource(semantic);
+    source = this.getSource(semantic) || attrs.source;
     target = this.getTarget(semantic);
+    semantic.style.source = source;
+    semantic.style.target = target;
 
     if (source && target) {
       elementDefinition = elementData(semantic, {
@@ -111,6 +138,7 @@ SagaImporter.prototype.add = function (semantic) {
         target,
         waypoints,
       });
+      // console.log(elementDefinition);
 
       element = elementFactory.createConnection(elementDefinition);
 
@@ -124,13 +152,13 @@ SagaImporter.prototype.add = function (semantic) {
 };
 
 SagaImporter.prototype.getSource = function (semantic) {
-  return this.getShape(semantic.sourceRef);
+  return this.getShape(semantic.style.source);
 };
 
 SagaImporter.prototype.getTarget = function (semantic) {
-  return this.getShape(semantic.targetRef);
+  return this.getShape(semantic.style.target);
 };
 
-SagaImporter.prototype.getShape = function (id) {
-  return this.elementRegistry.get(id);
+SagaImporter.prototype.getShape = function (name) {
+  return this.elementRegistry.find((element) => element.businessObject.name === name);
 };

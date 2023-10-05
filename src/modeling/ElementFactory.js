@@ -36,10 +36,7 @@ ElementFactory.prototype.create = function (elementType, attrs) {
 
   const size = sagaFactory.getDefaultSize(businessObject);
 
-  attrs = assign({
-    businessObject,
-    id: businessObject.id,
-  }, size, attrs);
+  attrs = assign({ businessObject }, size, attrs);
 
   return this.baseCreate(elementType, attrs);
 };

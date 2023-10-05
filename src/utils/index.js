@@ -1,6 +1,6 @@
+import { forEach, reduce } from 'min-dash';
 import { useContext } from '@bpmn-io/properties-panel/preact/hooks';
 import PropertiesPanelContext from '../features/properties-panel/PropertiesPanelContext';
-import { forEach, reduce } from 'min-dash';
 
 /**
  * Returns a random generated string for initial decision definition id.

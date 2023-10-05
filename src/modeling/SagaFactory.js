@@ -1,9 +1,9 @@
-import Transition from './spec/Transition';
-import StateMachine from './spec/StateMachine';
-import ServiceTask from './spec/ServiceTask';
-import StartState from './spec/StartState';
-import SucceedEnd from './spec/SucceedEnd';
-import FailEnd from './spec/FailEnd';
+import Transition from '../spec/Transition';
+import StateMachine from '../spec/StateMachine';
+import ServiceTask from '../spec/ServiceTask';
+import StartState from '../spec/StartState';
+import SucceedEnd from '../spec/SucceedEnd';
+import FailEnd from '../spec/FailEnd';
 
 export default function SagaFactory() {
   const typeToSpec = new Map();

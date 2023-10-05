@@ -1,7 +1,7 @@
 import React from '@bpmn-io/properties-panel/preact/compat';
 
 export default function ExportControl(props) {
-  const { sagaExporter } = props;
+  const { editor } = props;
 
   function download(data) {
     const a = document.createElement('a');
@@ -26,7 +26,7 @@ export default function ExportControl(props) {
           id="export-json"
           type="button"
           title="Export as state machine definition"
-          onClick={() => download(sagaExporter.export())}
+          onClick={() => download(editor.export())}
         >
           <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="1em">
             <path

@@ -20,4 +20,4 @@ export default class EdgeStyle extends BaseSpec {
   waypoints = [];
 }
 
-EdgeStyle.prototype.type = 'Node';
+EdgeStyle.prototype.type = 'Edge';
