@@ -1,5 +1,4 @@
 import { assign } from 'min-dash';
-import Node from '../spec/style/Node';
 import Edge from '../spec/style/Edge';
 import StateMachine from '../spec/StateMachine';
 import StartState from '../spec/StartState';

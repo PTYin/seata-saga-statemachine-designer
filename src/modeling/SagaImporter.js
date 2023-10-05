@@ -2,7 +2,6 @@ import {
   assign, forEach,
   map,
 } from 'min-dash';
-import StartState from '../spec/StartState';
 
 // helper /////
 function elementData(semantic, attrs) {
