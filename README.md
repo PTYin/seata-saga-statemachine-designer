@@ -1,6 +1,6 @@
-# diagram-js Editor Example
+# Seata Saga state machine designer
 
-A simple diagram editor built with diagram-js.
+Simple demo for [discussion](https://github.com/seata/seata/discussions/6021).
 
 ![Screenshot](docs/screenshot.png)
 
